@@ -1,4 +1,4 @@
-# LINEARREGRESSION
+# LINEAR REGRESSION
 Objective
 The increasing urgency to address climate change necessitates innovative approaches that leverage data analytics and artificial intelligence (AI) to formulate effective strategies for mitigating its impact. This work aims to design an AI model capable of predicting and mitigating climate change impacts by analyzing historical climate data, current environmental conditions, and human activities. By providing valuable insights to policymakers and organizations, this solution seeks to foster the development of informed and actionable climate action plans.
 Sources
