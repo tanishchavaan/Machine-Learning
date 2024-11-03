@@ -1,0 +1,71 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+# Load the dataset
+file_path = '/mnt/data/climate-change-excel-4-6-mb-.csv'
+dataset = pd.read_csv(file_path)
+
+# Step 1: Data Cleaning
+# Replace placeholders like ".." with NaN and convert year columns to numeric
+dataset.replace("..", np.nan, inplace=True)
+yearly_columns = [str(year) for year in range(1990, 2012)]
+dataset[yearly_columns] = dataset[yearly_columns].apply(pd.to_numeric, errors='coerce')
+
+# Drop unnecessary columns that might contain non-numeric data
+dataset.drop(columns=['Country code', 'Country name', 'Series code', 'SCALE', 'Decimals'], inplace=True)
+
+# Step 2: Filter for Target Data (e.g., CO2 emissions data)
+# Select rows that contain "CO2 emissions" in the Series name
+target_data = dataset[dataset['Series name'].str.contains("CO2 emissions", case=False, na=False)].copy()
+
+# Drop 'Series name' column after filtering
+target_data.drop(columns=['Series name'], inplace=True)
+
+# Fill missing values with forward-fill
+target_data.fillna(method='ffill', axis=1, inplace=True)
+
+# Ensure all columns are numeric
+target_data = target_data.apply(pd.to_numeric, errors='coerce')
+
+# Drop any rows with remaining NaN values
+target_data.dropna(inplace=True)
+
+# Define features (historical data from 1990 to 2010) and labels (use 2011 as the target)
+features = target_data[yearly_columns[:-1]]  # All years except the target year
+labels = target_data['2011']  # Use 2011 as the target variable
+
+# Step 3: Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
+
+# Step 4: Model Training - Using Linear Regression
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Step 5: Model Prediction and Evaluation
+y_pred = model.predict(X_test)
+
+# Calculate Mean Squared Error and R2 Score
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R2 Score: {r2}")
+
+# Additional: Display coefficients to show feature importance
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Plot feature importance (coefficients for Linear Regression)
+coef_df = pd.DataFrame({
+    'Year': yearly_columns[:-1],
+    'Coefficient': model.coef_
+})
+sns.barplot(x='Year', y='Coefficient', data=coef_df)
+plt.xlabel('Year')
+plt.ylabel('Coefficient')
+plt.title('Feature Importance by Year (Linear Regression Coefficients)')
+plt.xticks(rotation=45)
+plt.show()
