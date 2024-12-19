@@ -10,7 +10,7 @@ string solution(int n, int m) {
         return "greater";
     }
 }
-
+hi , i am
 int main() {
     int n, m;
     cin >> n >> m;
