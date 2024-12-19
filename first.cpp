@@ -11,6 +11,7 @@ string solution(int n, int m) {
     }
 }
 hi , i am
+hi , i
 int main() {
     int n, m;
     cin >> n >> m;
